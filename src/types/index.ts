@@ -79,6 +79,7 @@ export interface ItemReadOnlyDTO {
   stockQuantity: number
   weightPerUoM?: number
   weight?: number
+  unitOfMeasureId: number
   unitOfMeasureSymbol: string
   weightUoMSymbol?: string
 }
@@ -95,27 +96,27 @@ export interface ItemInsertDTO {
 
 // ─── BOM ─────────────────────────────────────────────────────────────────────
 
-export interface BomEntryReadOnlyDTO {
+export interface BomLineReadOnlyDTO {
   id: number
   componentItemId: number
   componentItemCode: string
   componentItemName: string
   quantity: number
   unitOfMeasureSymbol: string
+  notes?: string
 }
 
 // ─── Routing ─────────────────────────────────────────────────────────────────
 
-export interface RoutingOperationReadOnlyDTO {
+export interface RoutingStepReadOnlyDTO {
   id: number
   sequence: number
   operationName: string
+  estimatedMinutes: number
   workstationCode: string
   workstationName: string
   machineCode?: string
   machineName?: string
-  setupTime?: number
-  runTime?: number
   notes?: string
 }
 
