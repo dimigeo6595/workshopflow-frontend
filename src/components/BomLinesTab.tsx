@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/context/AuthProvider'
-import { getBom, deleteBomLine } from '@/api/bom'
-import type { BomLineReadOnlyDTO } from '@/types'
-import { Plus, Trash2 } from 'lucide-react'
+import { getBom, addBomLine, deleteBomLine } from '@/api/bom'
+import { getUoMs } from '@/api/uom'
+import { calculateWeight } from '@/api/items'
+import { bomLineSchema, type BomLineFormFields } from '@/schemas/bom'
+import type { BomLineReadOnlyDTO, ItemReadOnlyDTO, UoMReadOnlyDTO } from '@/types'
+import { Plus, Trash2, Calculator } from 'lucide-react'
 import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { addBomLine } from '@/api/bom'
-import { getUoMs } from '@/api/uom'
-import { bomLineSchema, type BomLineFormFields } from '@/schemas/bom'
-import type { ItemReadOnlyDTO, UoMReadOnlyDTO } from '@/types'
 import ItemAutocomplete from '@/components/ItemAutocomplete'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -26,7 +25,8 @@ export default function BomLinesTab({ producedItemId }: BomLinesTabProps) {
     const [showAddForm, setShowAddForm] = useState(false)
     const [uoms, setUoms] = useState<UoMReadOnlyDTO[]>([])
     const [selectedComponent, setSelectedComponent] = useState<ItemReadOnlyDTO | null>(null)
-
+    const [calculating, setCalculating] = useState(false)
+    const [calculatedWeight, setCalculatedWeight] = useState<number | null>(null)
 
     useEffect(() => {
         if (!accessToken) return
@@ -52,9 +52,6 @@ export default function BomLinesTab({ producedItemId }: BomLinesTabProps) {
         resolver: zodResolver(bomLineSchema),
     })
 
-
-
-
     async function onSubmitAdd(data: BomLineFormFields) {
         if (!accessToken) return
 
@@ -75,11 +72,6 @@ export default function BomLinesTab({ producedItemId }: BomLinesTabProps) {
         }
     }
 
-
-
-
-
-
     async function handleDelete(bomLineId: number, componentName: string) {
         if (!accessToken) return
         if (!window.confirm(`Remove "${componentName}" from the BOM?`)) return
@@ -91,6 +83,21 @@ export default function BomLinesTab({ producedItemId }: BomLinesTabProps) {
         } catch (err) {
             toast.error('Failed to remove component')
             console.error(err)
+        }
+    }
+
+    async function handleCalculateWeight() {
+        if (!accessToken) return
+
+        setCalculating(true)
+        try {
+            const updated = await calculateWeight(accessToken, producedItemId)
+            setCalculatedWeight(updated.weight ?? null)
+            toast.success('Weight calculated')
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : 'Failed to calculate weight')
+        } finally {
+            setCalculating(false)
         }
     }
 
@@ -132,6 +139,29 @@ export default function BomLinesTab({ producedItemId }: BomLinesTabProps) {
                     </button>
                 </div>
             ))}
+
+            {bomLines.length > 0 && (
+                <div className="flex items-center justify-between rounded-lg border border-dashed px-4 py-3">
+                    <div>
+                        <p className="text-sm font-medium">Total weight</p>
+                        <p className="text-sm text-muted-foreground">
+                            {calculatedWeight !== null
+                                ? `${calculatedWeight.toFixed(2)} kg`
+                                : 'Not calculated yet'}
+                        </p>
+                    </div>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleCalculateWeight}
+                        disabled={calculating}
+                    >
+                        <Calculator className="w-4 h-4" />
+                        {calculating ? 'Calculating...' : 'Calculate'}
+                    </Button>
+                </div>
+            )}
 
             {!showAddForm ? (
                 <button
@@ -215,4 +245,3 @@ export default function BomLinesTab({ producedItemId }: BomLinesTabProps) {
         </div>
     )
 }
-

@@ -101,4 +101,21 @@ export async function updateItem(
     return res.json()
 }
 
+export async function calculateWeight(
+    token: string,
+    itemId: number,
+): Promise<ItemReadOnlyDTO> {
+    const res = await fetch(`${apiUrl('items')}/${itemId}/calculate-weight`, {
+        method: 'POST',
+        headers: authHeader(token),
+    })
+
+    if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        throw new Error(data?.detail ?? data?.message ?? 'Failed to calculate weight')
+    }
+
+    return res.json()
+}
+
 

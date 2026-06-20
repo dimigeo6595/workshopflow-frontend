@@ -11,7 +11,7 @@ import type { ItemReadOnlyDTO, UoMReadOnlyDTO } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldLabel } from '@/components/ui/field'
-import BomLinesTab from "@/components/BomLinesTab.tsx";
+import BomLinesTab from '@/components/BomLinesTab'
 import RoutingStepsTab from '@/components/RoutingStepsTab'
 
 interface ItemFormModalProps {
@@ -31,11 +31,11 @@ export default function ItemFormModal({ item, onClose, onSuccess }: ItemFormModa
 
     const [activeTab, setActiveTab] = useState<'details' | 'bom' | 'routing'>('details')
 
-
-
     const {
         register,
         handleSubmit,
+        watch,
+        setValue,
         formState: { errors, isSubmitting },
     } = useForm<ItemFormFields>({
         resolver: zodResolver(itemSchema),
@@ -59,11 +59,14 @@ export default function ItemFormModal({ item, onClose, onSuccess }: ItemFormModa
         if (!accessToken) return
 
         getUoMs(accessToken)
-            .then(setUoms)
+            .then(data => {
+                setUoms(data)
+                if (!isEditMode && data.length > 0) {
+                    setValue('unitOfMeasureId', data[0].id, { shouldValidate: true, shouldDirty: true })
+                }
+            })
             .catch(err => console.error('Failed to load UoMs', err))
-    }, [accessToken])
-
-
+    }, [accessToken, isEditMode, setValue])
 
     const onSubmit = async (data: ItemFormFields) => {
         if (!accessToken) return
@@ -98,7 +101,8 @@ export default function ItemFormModal({ item, onClose, onSuccess }: ItemFormModa
         }
     }
 
-
+    const watchedItemType = watch('itemType')
+    const isRawOrConsumable = watchedItemType === 'RawMaterial' || watchedItemType === 'Consumable'
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -136,92 +140,102 @@ export default function ItemFormModal({ item, onClose, onSuccess }: ItemFormModa
                 {activeTab === 'details' && (
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 px-6 py-5">
 
-                    <Field>
-                        <FieldLabel htmlFor="itemCode">Item Code</FieldLabel>
-                        <Input
-                            id="itemCode"
-                            disabled={isEditMode}
-                            {...register('itemCode')}
-                        />
-                        {errors.itemCode && (
-                            <p className="text-sm text-destructive">{errors.itemCode.message}</p>
-                        )}
-                    </Field>
+                        <Field>
+                            <FieldLabel htmlFor="itemCode">Item Code</FieldLabel>
+                            <Input
+                                id="itemCode"
+                                disabled={isEditMode}
+                                {...register('itemCode')}
+                            />
+                            {errors.itemCode && (
+                                <p className="text-sm text-destructive">{errors.itemCode.message}</p>
+                            )}
+                        </Field>
 
-                    <Field>
-                        <FieldLabel htmlFor="name">Name</FieldLabel>
-                        <Input id="name" {...register('name')} />
-                        {errors.name && (
-                            <p className="text-sm text-destructive">{errors.name.message}</p>
-                        )}
-                    </Field>
+                        <Field>
+                            <FieldLabel htmlFor="name">Name</FieldLabel>
+                            <Input id="name" {...register('name')} />
+                            {errors.name && (
+                                <p className="text-sm text-destructive">{errors.name.message}</p>
+                            )}
+                        </Field>
 
-                    <Field>
-                        <FieldLabel htmlFor="description">Description</FieldLabel>
-                        <Input id="description" {...register('description')} />
-                        {errors.description && (
-                            <p className="text-sm text-destructive">{errors.description.message}</p>
-                        )}
-                    </Field>
+                        <Field>
+                            <FieldLabel htmlFor="description">Description</FieldLabel>
+                            <Input id="description" {...register('description')} />
+                            {errors.description && (
+                                <p className="text-sm text-destructive">{errors.description.message}</p>
+                            )}
+                        </Field>
 
-                    <Field>
-                        <FieldLabel htmlFor="itemType">Item Type</FieldLabel>
-                        <select
-                            id="itemType"
-                            {...register('itemType')}
-                            className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-                        >
-                            <option value="RawMaterial">Raw Material</option>
-                            <option value="SemiFinished">Semi-Finished</option>
-                            <option value="FinalProduct">Final Product</option>
-                            <option value="Consumable">Consumable</option>
-                        </select>
-                        {errors.itemType && (
-                            <p className="text-sm text-destructive">{errors.itemType.message}</p>
-                        )}
-                    </Field>
+                        <Field>
+                            <FieldLabel htmlFor="itemType">Item Type</FieldLabel>
+                            <select
+                                id="itemType"
+                                {...register('itemType')}
+                                className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                            >
+                                <option value="RawMaterial">Raw Material</option>
+                                <option value="SemiFinished">Semi-Finished</option>
+                                <option value="FinalProduct">Final Product</option>
+                                <option value="Consumable">Consumable</option>
+                            </select>
+                            {errors.itemType && (
+                                <p className="text-sm text-destructive">{errors.itemType.message}</p>
+                            )}
+                        </Field>
 
-                    <Field>
-                        <FieldLabel htmlFor="unitOfMeasureId">Unit of Measure</FieldLabel>
-                        <select
-                            id="unitOfMeasureId"
-                            defaultValue={item?.unitOfMeasureSymbol ? '' : ''}
-                            {...register('unitOfMeasureId', { valueAsNumber: true })}
-                            className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-                        >
-                            <option value="">Select unit...</option>
-                            {uoms.map(uom => (
-                                <option key={uom.id} value={uom.id}>
-                                    {uom.name} ({uom.symbol})
-                                </option>
-                            ))}
-                        </select>
-                        {errors.unitOfMeasureId && (
-                            <p className="text-sm text-destructive">{errors.unitOfMeasureId.message}</p>
-                        )}
-                    </Field>
+                        <Field>
+                            <FieldLabel htmlFor="unitOfMeasureId">Unit of Measure</FieldLabel>
+                            <select
+                                id="unitOfMeasureId"
+                                key={uoms.length}
+                                {...register('unitOfMeasureId', { valueAsNumber: true })}
+                                className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                            >
+                                <option value="">Select unit...</option>
+                                {uoms.map(uom => (
+                                    <option key={uom.id} value={uom.id}>
+                                        {uom.name} ({uom.symbol})
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.unitOfMeasureId && (
+                                <p className="text-sm text-destructive">{errors.unitOfMeasureId.message}</p>
+                            )}
+                        </Field>
 
-                    <Field>
-                        <FieldLabel htmlFor="weightPerUoM">Weight per UoM (kg) — optional</FieldLabel>
-                        <Input
-                            id="weightPerUoM"
-                            type="number"
-                            step="0.01"
-                            {...register('weightPerUoM', { valueAsNumber: true })}
-                        />
-                        {errors.weightPerUoM && (
-                            <p className="text-sm text-destructive">{errors.weightPerUoM.message}</p>
+                        {isRawOrConsumable && (
+                            <Field>
+                                <FieldLabel htmlFor="weightPerUoM">Weight per UoM (kg) — optional</FieldLabel>
+                                <Input
+                                    id="weightPerUoM"
+                                    type="number"
+                                    step="0.01"
+                                    {...register('weightPerUoM', {
+                                        setValueAs: v => (v === '' ? undefined : Number(v)),
+                                    })}
+                                />
+                                {errors.weightPerUoM && (
+                                    <p className="text-sm text-destructive">{errors.weightPerUoM.message}</p>
+                                )}
+                            </Field>
                         )}
-                    </Field>
 
-                    <div className="flex justify-end gap-3 pt-2">
-                        <Button type="button" variant="secondary" onClick={onClose}>
-                            Cancel
-                        </Button>
-                        <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? 'Saving...' : isEditMode ? 'Save changes' : 'Create item'}
-                        </Button>
-                    </div>
+                        {!isRawOrConsumable && watchedItemType && (
+                            <p className="text-sm text-muted-foreground rounded-md border border-dashed px-3 py-2">
+                                Weight for manufactured items is calculated automatically from the BOM.
+                            </p>
+                        )}
+
+                        <div className="flex justify-end gap-3 pt-2">
+                            <Button type="button" variant="secondary" onClick={onClose}>
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={isSubmitting}>
+                                {isSubmitting ? 'Saving...' : isEditMode ? 'Save changes' : 'Create item'}
+                            </Button>
+                        </div>
                     </form>
                 )}
 
@@ -237,15 +251,7 @@ export default function ItemFormModal({ item, onClose, onSuccess }: ItemFormModa
                     </div>
                 )}
 
-
-
             </div>
         </div>
     )
 }
-
-
-
-
-
-
