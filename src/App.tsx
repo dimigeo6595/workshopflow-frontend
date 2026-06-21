@@ -10,7 +10,7 @@ import ItemsPage from '@/pages/ItemsPage'
 import WorkOrdersPage from '@/pages/WorkOrdersPage'
 import InventoryPage from '@/pages/InventoryPage'
 import WorkstationsPage from '@/pages/WorkstationsPage'
-const UsersPage = () => <div><h2 className="text-2xl font-bold mb-2">Users</h2><p className="text-muted-foreground">Coming soon...</p></div>
+import UsersPage from '@/pages/UsersPage'
 
 function App() {
     return (

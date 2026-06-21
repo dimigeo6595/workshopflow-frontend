@@ -16,7 +16,7 @@ const AppLayout = () => {
                     <Outlet />
                 </main>
             </div>
-            <Toaster />
+            <Toaster position="top-right" />
         </div>
     )
 }

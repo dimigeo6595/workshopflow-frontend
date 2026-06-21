@@ -59,6 +59,11 @@ export interface UserReadOnlyDTO {
   role: UserRole
 }
 
+export interface RoleReadOnlyDTO {
+  id: number
+  name: string
+}
+
 // ─── Unit of Measure ─────────────────────────────────────────────────────────
 
 export interface UoMReadOnlyDTO {
