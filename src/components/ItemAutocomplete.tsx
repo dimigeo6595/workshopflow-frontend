@@ -8,7 +8,8 @@ import { Search } from 'lucide-react'
 interface ItemAutocompleteProps {
     value: ItemReadOnlyDTO | null
     onChange: (item: ItemReadOnlyDTO) => void
-    excludeItemId?: number   // για να μην επιλέξει το ίδιο item ως δικό του component
+    excludeItemId?: number
+    itemTypeFilter?: string[]   // π.χ. ['SemiFinished', 'FinalProduct']
     placeholder?: string
 }
 
@@ -16,6 +17,7 @@ export default function ItemAutocomplete({
                                              value,
                                              onChange,
                                              excludeItemId,
+                                             itemTypeFilter,
                                              placeholder = 'Search item by name or code...',
                                          }: ItemAutocompleteProps) {
     const { accessToken } = useAuth()
@@ -37,9 +39,12 @@ export default function ItemAutocomplete({
         getItems(accessToken, { name: debouncedQuery, pageSize: 10 })
             .then(res => {
                 if (cancelled) return
-                const filtered = excludeItemId
+                let filtered = excludeItemId
                     ? res.data.filter(item => item.id !== excludeItemId)
                     : res.data
+                if (itemTypeFilter && itemTypeFilter.length > 0) {
+                    filtered = filtered.filter(item => itemTypeFilter.includes(item.itemType))
+                }
                 setResults(filtered)
             })
             .catch(err => console.error(err))
@@ -47,7 +52,7 @@ export default function ItemAutocomplete({
         return () => {
             cancelled = true
         }
-    }, [accessToken, debouncedQuery, excludeItemId])
+    }, [accessToken, debouncedQuery, excludeItemId, itemTypeFilter])
 
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {

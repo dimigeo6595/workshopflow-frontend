@@ -7,7 +7,7 @@ import AppLayout from '@/components/AppLayout'
 // Placeholders — θα γίνουν πραγματικές σελίδες σύντομα
 import DashboardPage from '@/pages/DashboardPage'
 import ItemsPage from '@/pages/ItemsPage'
-const WorkOrdersPage = () => <div><h2 className="text-2xl font-bold mb-2">Work Orders</h2><p className="text-muted-foreground">Coming soon...</p></div>
+import WorkOrdersPage from '@/pages/WorkOrdersPage'
 const InventoryPage = () => <div><h2 className="text-2xl font-bold mb-2">Inventory</h2><p className="text-muted-foreground">Coming soon...</p></div>
 const WorkstationsPage = () => <div><h2 className="text-2xl font-bold mb-2">Workstations</h2><p className="text-muted-foreground">Coming soon...</p></div>
 const UsersPage = () => <div><h2 className="text-2xl font-bold mb-2">Users</h2><p className="text-muted-foreground">Coming soon...</p></div>
