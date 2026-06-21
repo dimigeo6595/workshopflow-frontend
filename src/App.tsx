@@ -4,12 +4,12 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import AppLayout from '@/components/AppLayout'
 
 
-// Placeholders — θα γίνουν πραγματικές σελίδες σύντομα
+
 import DashboardPage from '@/pages/DashboardPage'
 import ItemsPage from '@/pages/ItemsPage'
 import WorkOrdersPage from '@/pages/WorkOrdersPage'
 import InventoryPage from '@/pages/InventoryPage'
-const WorkstationsPage = () => <div><h2 className="text-2xl font-bold mb-2">Workstations</h2><p className="text-muted-foreground">Coming soon...</p></div>
+import WorkstationsPage from '@/pages/WorkstationsPage'
 const UsersPage = () => <div><h2 className="text-2xl font-bold mb-2">Users</h2><p className="text-muted-foreground">Coming soon...</p></div>
 
 function App() {

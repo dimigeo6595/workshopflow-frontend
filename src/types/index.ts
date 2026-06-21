@@ -128,14 +128,14 @@ export interface WorkstationReadOnlyDTO {
   id: number
   code: string
   name: string
-  description?: string
+  notes?: string
 }
 
 export interface MachineReadOnlyDTO {
   id: number
   code: string
   name: string
-  description?: string
+  notes?: string
   workstationId: number
 }
 
