@@ -188,8 +188,7 @@ export interface InventoryTransactionReadOnlyDTO {
   itemName: string
   transactionType: TransactionType
   quantity: number
-  unitOfMeasureSymbol: string
-  transactionDate: string
+  insertedAt: string
   notes?: string
   workOrderCode?: string
   createdByUsername: string
