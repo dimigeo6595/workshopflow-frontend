@@ -1,5 +1,4 @@
 import { Outlet } from 'react-router'
-import { Toaster } from '@/components/ui/sonner'
 import Sidebar from '@/components/Sidebar'
 import AppHeader from '@/components/AppHeader'
 import { useState } from 'react'
@@ -16,7 +15,6 @@ const AppLayout = () => {
                     <Outlet />
                 </main>
             </div>
-            <Toaster position="top-right" />
         </div>
     )
 }

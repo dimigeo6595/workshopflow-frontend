@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import UserFormModal from '@/components/UserFormModal'
 
 export default function UsersPage() {
-    const { accessToken, user: currentUser } = useAuth()
+    const { accessToken, user: currentUser, hasCapability } = useAuth()
 
     const [users, setUsers] = useState<UserReadOnlyDTO[]>([])
     const [roles, setRoles] = useState<RoleReadOnlyDTO[]>([])
@@ -110,10 +110,12 @@ export default function UsersPage() {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between gap-3">
-                <Button onClick={handleOpenCreate}>
-                    <Plus className="w-4 h-4" />
-                    New User
-                </Button>
+                {hasCapability('INSERT_USER') && (
+                    <Button onClick={handleOpenCreate}>
+                        <Plus className="w-4 h-4" />
+                        New User
+                    </Button>
+                )}
 
                 <div className="flex items-center gap-2">
                     <input
@@ -176,14 +178,16 @@ export default function UsersPage() {
                     </span>
                                 </td>
                                 <td className="py-3 px-4 text-right space-x-2">
-                                    <button
-                                        onClick={() => handleOpenEdit(u)}
-                                        className="text-muted-foreground hover:text-foreground transition-colors"
-                                        aria-label="Edit user"
-                                    >
-                                        <Pencil className="w-4 h-4" />
-                                    </button>
-                                    {Number(currentUser?.userId) !== u.id && (
+                                    {hasCapability('EDIT_USER') && (
+                                        <button
+                                            onClick={() => handleOpenEdit(u)}
+                                            className="text-muted-foreground hover:text-foreground transition-colors"
+                                            aria-label="Edit user"
+                                        >
+                                            <Pencil className="w-4 h-4" />
+                                        </button>
+                                    )}
+                                    {hasCapability('DELETE_USER') && Number(currentUser?.userId) !== u.id && (
                                         <button
                                             onClick={() => handleDelete(u.id, u.username)}
                                             className="text-muted-foreground hover:text-destructive transition-colors"
@@ -226,7 +230,7 @@ export default function UsersPage() {
                 </div>
             )}
 
-            {modalOpen && (
+            {modalOpen && hasCapability('EDIT_USER') && (
                 <UserFormModal
                     user={editingUser}
                     roles={roles}

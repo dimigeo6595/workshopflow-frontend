@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 
 
 export default function ItemsPage() {
-    const { accessToken } = useAuth()
+    const { accessToken, hasCapability } = useAuth()
 
     const [items, setItems] = useState<ItemReadOnlyDTO[]>([])
     const [loading, setLoading] = useState(true)
@@ -120,10 +120,12 @@ export default function ItemsPage() {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between gap-3">
-                <Button onClick={handleOpenCreate}>
-                    <Plus className="w-4 h-4" />
-                    New Item
-                </Button>
+                {hasCapability('INSERT_ITEM') && (
+                    <Button onClick={handleOpenCreate}>
+                        <Plus className="w-4 h-4" />
+                        New Item
+                    </Button>
+                )}
 
                 <div className="flex items-center gap-3">
                     <input
@@ -196,29 +198,30 @@ export default function ItemsPage() {
                         </tr>
                     ) : (
                         items.map(item => (
-                            <tr key={item.id} className="border-b last:border-0 hover:bg-muted/50 transition-colors">
+                            <tr
+                                key={item.id}
+                                onClick={() => hasCapability('EDIT_ITEM') && handleOpenEdit(item)}
+                                className={`border-b last:border-0 hover:bg-muted/50 transition-colors ${
+                                    hasCapability('EDIT_ITEM') ? 'cursor-pointer' : 'cursor-default'
+                                }`}
+                            >
                                 <td className="py-3 px-4 font-mono text-xs">{item.itemCode}</td>
-                                <td className="py-3 px-4 font-medium">
-                                    <button
-                                        onClick={() => handleOpenEdit(item)}
-                                        className="hover:underline hover:text-primary transition-colors text-left"
-                                    >
-                                        {item.name}
-                                    </button>
-                                </td>
+                                <td className="py-3 px-4 font-medium">{item.name}</td>
                                 <td className="py-3 px-4">{item.itemType}</td>
                                 <td className="py-3 px-4">
                                     {item.stockQuantity} {item.unitOfMeasureSymbol}
                                 </td>
                                 <td className="py-3 px-4 text-muted-foreground">{item.unitOfMeasureSymbol}</td>
                                 <td className="py-3 px-4 text-right">
-                                    <button
-                                        onClick={() => handleDelete(item.id, item.name)}
-                                        className="text-muted-foreground hover:text-destructive transition-colors"
-                                        aria-label="Delete item"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
+                                    {hasCapability('DELETE_ITEM') && (
+                                        <button
+                                            onClick={() => handleDelete(item.id, item.name)}
+                                            className="text-muted-foreground hover:text-destructive transition-colors"
+                                            aria-label="Delete item"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))
@@ -255,7 +258,7 @@ export default function ItemsPage() {
             )}
 
             {/* Create/Edit modal */}
-            {modalOpen && (
+            {modalOpen && hasCapability('EDIT_ITEM') && (
                 <ItemFormModal
                     item={editingItem}
                     onClose={handleCloseModal}

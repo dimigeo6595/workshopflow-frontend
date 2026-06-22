@@ -21,17 +21,17 @@ interface SidebarProps {
 }
 
 const navItems = [
-    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/items', label: 'Items', icon: Package },
-    { to: '/workorders', label: 'Work Orders', icon: ClipboardList },
-    { to: '/inventory', label: 'Inventory', icon: Warehouse },
-    { to: '/workstations', label: 'Workstations', icon: Wrench },
-    { to: '/users', label: 'Users', icon: Users },
-]
+    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, capability: null },
+    { to: '/items', label: 'Items', icon: Package, capability: 'VIEW_ITEMS' },
+    { to: '/workorders', label: 'Work Orders', icon: ClipboardList, capability: 'VIEW_WORK_ORDERS' },
+    { to: '/inventory', label: 'Inventory', icon: Warehouse, capability: 'VIEW_INVENTORY' },
+    { to: '/workstations', label: 'Workstations', icon: Wrench, capability: 'VIEW_MACHINES' },
+    { to: '/users', label: 'Users', icon: Users, capability: 'VIEW_USERS' },
+] as const
 
 const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
     const { pathname } = useLocation()
-    const { user, logoutUser } = useAuth()
+    const { user, logoutUser, hasCapability } = useAuth()
     const navigate = useNavigate()
 
     const handleLogout = () => {
@@ -61,7 +61,9 @@ const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
 
             {/* Nav links */}
             <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1">
-                {navItems.map(({ to, label, icon: Icon }) => {
+                {navItems.filter(item =>
+                    item.capability === null || hasCapability(item.capability)
+                ).map(({ to, label, icon: Icon }) => {
                     const active = pathname === to || pathname.startsWith(to + '/')
                     return (
                         <Link

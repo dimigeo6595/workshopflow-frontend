@@ -9,7 +9,7 @@ import WorkOrderFormModal from '@/components/WorkOrderFormModal'
 import WorkOrderDetailModal from '@/components/WorkOrderDetailModal'
 
 export default function WorkOrdersPage() {
-    const { accessToken } = useAuth()
+    const { accessToken, hasCapability } = useAuth()
 
     const [workOrders, setWorkOrders] = useState<WorkOrderReadOnlyDTO[]>([])
     const [loading, setLoading] = useState(true)
@@ -79,10 +79,12 @@ export default function WorkOrdersPage() {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between gap-3">
-                <Button onClick={() => setModalOpen(true)}>
-                    <Plus className="w-4 h-4" />
-                    New Work Order
-                </Button>
+                {hasCapability('INSERT_WORK_ORDER') && (
+                    <Button onClick={() => setModalOpen(true)}>
+                        <Plus className="w-4 h-4" />
+                        New Work Order
+                    </Button>
+                )}
 
                 <select
                     value={filterStatus}
@@ -183,14 +185,14 @@ export default function WorkOrdersPage() {
                 </div>
             )}
 
-            {modalOpen && (
+            {modalOpen && hasCapability('INSERT_WORK_ORDER') && (
                 <WorkOrderFormModal
                     onClose={() => setModalOpen(false)}
                     onSuccess={handleModalSuccess}
                 />
             )}
 
-            {selectedWorkOrder && (
+            {selectedWorkOrder && hasCapability('INSERT_WORK_ORDER') && (
                 <WorkOrderDetailModal
                     workOrder={selectedWorkOrder}
                     onClose={handleCloseDetail}

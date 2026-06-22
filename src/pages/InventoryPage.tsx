@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
 export default function InventoryPage() {
-    const { accessToken } = useAuth()
+    const { accessToken, hasCapability } = useAuth()
 
     const [selectedItem, setSelectedItem] = useState<ItemReadOnlyDTO | null>(null)
     const [transactions, setTransactions] = useState<InventoryTransactionReadOnlyDTO[]>([])
@@ -110,13 +110,15 @@ export default function InventoryPage() {
                                 Current stock: {selectedItem.stockQuantity} {selectedItem.unitOfMeasureSymbol}
                             </p>
                         </div>
-                        <Button onClick={() => setShowAddForm(true)}>
-                            <Plus className="w-4 h-4" />
-                            Add transaction
-                        </Button>
+                        {hasCapability('ADJUST_INVENTORY') && (
+                            <Button onClick={() => setShowAddForm(true)}>
+                                <Plus className="w-4 h-4" />
+                                Add transaction
+                            </Button>
+                        )}
                     </div>
 
-                    {showAddForm && (
+                    {showAddForm && hasCapability('ADJUST_INVENTORY') && (
                         <form
                             onSubmit={handleSubmit(onSubmitAdd)}
                             className="space-y-3 rounded-lg border p-4"

@@ -13,9 +13,10 @@ import { Button } from '@/components/ui/button'
 import WorkstationFormModal from '@/components/WorkstationFormModal'
 import MachineFormModal from '@/components/MachineFormModal'
 import { Pencil } from 'lucide-react'
+import React from 'react'
 
 export default function WorkstationsPage() {
-    const {accessToken} = useAuth()
+    const { accessToken, hasCapability } = useAuth()
 
     const [workstations, setWorkstations] = useState<WorkstationReadOnlyDTO[]>([])
     const [loading, setLoading] = useState(true)
@@ -140,10 +141,12 @@ export default function WorkstationsPage() {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
-                <Button onClick={handleOpenCreateWs}>
-                    <Plus className="w-4 h-4" />
-                    New Workstation
-                </Button>
+                {hasCapability('EDIT_MACHINES') && (
+                    <Button onClick={handleOpenCreateWs}>
+                        <Plus className="w-4 h-4" />
+                        New Workstation
+                    </Button>
+                )}
             </div>
 
             <div className="rounded-xl border bg-card overflow-hidden">
@@ -167,9 +170,9 @@ export default function WorkstationsPage() {
                         </tr>
                     ) : (
                         workstations.map(ws => (
+                            <React.Fragment key={ws.id}>
                             <>
                                 <tr
-                                    key={ws.id}
                                     onClick={() => handleToggle(ws.id)}
                                     className="border-b last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
                                 >
@@ -184,26 +187,30 @@ export default function WorkstationsPage() {
                                     <td className="py-3 px-4 font-medium">{ws.name}</td>
                                     <td className="py-3 px-4 text-muted-foreground">{ws.notes ?? '—'}</td>
                                     <td className="py-3 px-4 text-right space-x-2">
-                                        <button
-                                            onClick={e => {
-                                                e.stopPropagation()
-                                                handleOpenEditWs(ws)
-                                            }}
-                                            className="text-muted-foreground hover:text-foreground transition-colors"
-                                            aria-label="Edit workstation"
-                                        >
-                                            <Pencil className="w-4 h-4" />
-                                        </button>
-                                        <button
-                                            onClick={e => {
-                                                e.stopPropagation()
-                                                handleDeleteWorkstation(ws.id, ws.name)
-                                            }}
-                                            className="text-muted-foreground hover:text-destructive transition-colors"
-                                            aria-label="Delete workstation"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
+                                        {hasCapability('EDIT_MACHINES') && (
+                                            <>
+                                                <button
+                                                    onClick={e => {
+                                                        e.stopPropagation()
+                                                        handleOpenEditWs(ws)
+                                                    }}
+                                                    className="text-muted-foreground hover:text-foreground transition-colors"
+                                                    aria-label="Edit workstation"
+                                                >
+                                                    <Pencil className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    onClick={e => {
+                                                        e.stopPropagation()
+                                                        handleDeleteWorkstation(ws.id, ws.name)
+                                                    }}
+                                                    className="text-muted-foreground hover:text-destructive transition-colors"
+                                                    aria-label="Delete workstation"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </>
+                                        )}
                                     </td>
                                 </tr>
 
@@ -213,10 +220,12 @@ export default function WorkstationsPage() {
                                             <div className="pl-8 space-y-2">
                                                 <div className="flex items-center justify-between">
                                                     <h4 className="text-sm font-medium text-muted-foreground">Machines</h4>
-                                                    <Button size="sm" variant="secondary" onClick={() => handleOpenCreateMachine(ws.id)}>
-                                                        <Plus className="w-3.5 h-3.5" />
-                                                        Add machine
-                                                    </Button>
+                                                    {hasCapability('EDIT_MACHINES') && (
+                                                        <Button size="sm" variant="secondary" onClick={() => handleOpenCreateMachine(ws.id)}>
+                                                            <Plus className="w-3.5 h-3.5" />
+                                                            Add machine
+                                                        </Button>
+                                                    )}
                                                 </div>
 
                                                 {loadingMachines ? (
@@ -242,22 +251,24 @@ export default function WorkstationsPage() {
                                                                     <p className="text-xs text-muted-foreground">{machine.notes}</p>
                                                                 )}
                                                             </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <button
-                                                                    onClick={() => handleOpenEditMachine(ws.id, machine)}
-                                                                    className="text-muted-foreground hover:text-foreground transition-colors"
-                                                                    aria-label="Edit machine"
-                                                                >
-                                                                    <Pencil className="w-3.5 h-3.5" />
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleDeleteMachine(ws.id, machine.id, machine.name)}
-                                                                    className="text-muted-foreground hover:text-destructive transition-colors"
-                                                                    aria-label="Delete machine"
-                                                                >
-                                                                    <Trash2 className="w-3.5 h-3.5" />
-                                                                </button>
-                                                            </div>
+                                                            {hasCapability('EDIT_MACHINES') && (
+                                                                <div className="flex items-center gap-2">
+                                                                    <button
+                                                                        onClick={() => handleOpenEditMachine(ws.id, machine)}
+                                                                        className="text-muted-foreground hover:text-foreground transition-colors"
+                                                                        aria-label="Edit machine"
+                                                                    >
+                                                                        <Pencil className="w-3.5 h-3.5" />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleDeleteMachine(ws.id, machine.id, machine.name)}
+                                                                        className="text-muted-foreground hover:text-destructive transition-colors"
+                                                                        aria-label="Delete machine"
+                                                                    >
+                                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                                    </button>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     ))
                                                 )}
@@ -265,7 +276,8 @@ export default function WorkstationsPage() {
                                         </td>
                                     </tr>
                                 )}
-                            </>
+                                </>
+                            </React.Fragment>
                         ))
                     )}
                     </tbody>
