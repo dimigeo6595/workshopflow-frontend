@@ -166,6 +166,7 @@ export interface WorkOrderReadOnlyDTO {
   id: number
   workOrderCode: string
   status: WorkOrderStatus
+  producedItemId: number
   producedItemCode: string
   producedItemName: string
   quantity: number
