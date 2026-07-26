@@ -1,12 +1,5 @@
-import {apiUrl} from "@/api/client.ts";
+import { apiUrl, authHeader, apiFetch } from '@/api/client'
 import type { PaginatedResult, WorkOrderReadOnlyDTO, WorkOrderOperationReadOnlyDTO } from '@/types'
-
-function authHeader(token: string) {
-    return {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-    }
-}
 
 export async function getWorkOrders(
     token: string,
@@ -18,7 +11,7 @@ export async function getWorkOrders(
     if (params?.pageNumber) query.set('pageNumber', String(params.pageNumber))
     if (params?.pageSize) query.set('pageSize', String(params.pageSize))
 
-    const res = await fetch(apiUrl('workorders'), {
+    const res = await apiFetch(`${apiUrl('workorders')}?${query}`, {
         headers: authHeader(token),
     })
 
@@ -44,7 +37,7 @@ export async function createWorkOrder(
     token: string,
     payload: WorkOrderInsertPayload,
 ): Promise<WorkOrderReadOnlyDTO> {
-    const res = await fetch(apiUrl('workorders'), {
+    const res = await apiFetch(apiUrl('workorders'), {
         method: 'POST',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -62,7 +55,7 @@ export async function updateWorkOrder(
     id: number,
     payload: WorkOrderUpdatePayload,
 ): Promise<WorkOrderReadOnlyDTO> {
-    const res = await fetch(`${apiUrl('workorders')}/${id}`, {
+    const res = await apiFetch(`${apiUrl('workorders')}/${id}`, {
         method: 'PUT',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -76,7 +69,7 @@ export async function updateWorkOrder(
 }
 
 export async function deleteWorkOrder(token: string, id: number): Promise<void> {
-    const res = await fetch(`${apiUrl('workorders')}/${id}`, {
+    const res = await apiFetch(`${apiUrl('workorders')}/${id}`, {
         method: 'DELETE',
         headers: authHeader(token),
     })
@@ -85,7 +78,7 @@ export async function deleteWorkOrder(token: string, id: number): Promise<void> 
 }
 
 export async function releaseWorkOrder(token: string, id: number): Promise<WorkOrderReadOnlyDTO> {
-    const res = await fetch(`${apiUrl('workorders')}/${id}/release`, {
+    const res = await apiFetch(`${apiUrl('workorders')}/${id}/release`, {
         method: 'POST',
         headers: authHeader(token),
     })
@@ -98,7 +91,7 @@ export async function releaseWorkOrder(token: string, id: number): Promise<WorkO
 }
 
 export async function cancelWorkOrder(token: string, id: number): Promise<void> {
-    const res = await fetch(`${apiUrl('workorders')}/${id}/cancel`, {
+    const res = await apiFetch(`${apiUrl('workorders')}/${id}/cancel`, {
         method: 'POST',
         headers: authHeader(token),
     })
@@ -113,7 +106,7 @@ export async function getOperations(
     token: string,
     workOrderId: number,
 ): Promise<WorkOrderOperationReadOnlyDTO[]> {
-    const res = await fetch(`${apiUrl('workorders')}/${workOrderId}/operations`, {
+    const res = await apiFetch(`${apiUrl('workorders')}/${workOrderId}/operations`, {
         headers: authHeader(token),
     })
 
@@ -127,7 +120,7 @@ export async function assignOperation(
     operationId: number,
     assignedToUserId: number,
 ): Promise<WorkOrderOperationReadOnlyDTO> {
-    const res = await fetch(
+    const res = await apiFetch(
         `${apiUrl('workorders')}/${workOrderId}/operations/${operationId}/assign`,
         {
             method: 'PATCH',
@@ -148,7 +141,7 @@ export async function startOperation(
     workOrderId: number,
     operationId: number,
 ): Promise<WorkOrderOperationReadOnlyDTO> {
-    const res = await fetch(
+    const res = await apiFetch(
         `${apiUrl('workorders')}/${workOrderId}/operations/${operationId}/start`,
         {
             method: 'PATCH',
@@ -168,7 +161,7 @@ export async function completeOperation(
     workOrderId: number,
     operationId: number,
 ): Promise<WorkOrderOperationReadOnlyDTO> {
-    const res = await fetch(
+    const res = await apiFetch(
         `${apiUrl('workorders')}/${workOrderId}/operations/${operationId}/complete`,
         {
             method: 'PATCH',
@@ -182,4 +175,3 @@ export async function completeOperation(
     }
     return res.json()
 }
-

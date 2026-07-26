@@ -1,8 +1,8 @@
-import { apiUrl, authHeader } from '@/api/client'
+import { apiUrl, authHeader, apiFetch } from '@/api/client'
 import type { UoMReadOnlyDTO } from '@/types'
 
 export async function getUoMs(token: string): Promise<UoMReadOnlyDTO[]> {
-    const res = await fetch(apiUrl('uom'), {
+    const res = await apiFetch(apiUrl('uom'), {
         headers: authHeader(token),
     })
 

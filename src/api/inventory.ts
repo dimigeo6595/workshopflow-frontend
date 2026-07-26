@@ -1,11 +1,11 @@
-import { apiUrl, authHeader } from '@/api/client'
+import { apiUrl, authHeader, apiFetch } from '@/api/client'
 import type { InventoryTransactionReadOnlyDTO } from '@/types'
 
 export async function getTransactionsByItem(
     token: string,
     itemId: number,
 ): Promise<InventoryTransactionReadOnlyDTO[]> {
-    const res = await fetch(`${apiUrl('inventory')}/items/${itemId}`, {
+    const res = await apiFetch(`${apiUrl('inventory')}/items/${itemId}`, {
         headers: authHeader(token),
     })
 
@@ -24,7 +24,7 @@ export async function createManualTransaction(
     token: string,
     payload: InventoryTransactionInsertPayload,
 ): Promise<InventoryTransactionReadOnlyDTO> {
-    const res = await fetch(apiUrl('inventory'), {
+    const res = await apiFetch(apiUrl('inventory'), {
         method: 'POST',
         headers: authHeader(token),
         body: JSON.stringify(payload),

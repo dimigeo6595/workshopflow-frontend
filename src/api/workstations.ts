@@ -1,8 +1,8 @@
-import { apiUrl, authHeader } from '@/api/client'
+import { apiUrl, authHeader, apiFetch } from '@/api/client'
 import type { WorkstationReadOnlyDTO, MachineReadOnlyDTO } from '@/types'
 
 export async function getWorkstations(token: string): Promise<WorkstationReadOnlyDTO[]> {
-    const res = await fetch(apiUrl('workstations'), {
+    const res = await apiFetch(apiUrl('workstations'), {
         headers: authHeader(token),
     })
 
@@ -14,7 +14,7 @@ export async function getMachines(
     token: string,
     workstationId: number,
 ): Promise<MachineReadOnlyDTO[]> {
-    const res = await fetch(`${apiUrl('workstations')}/${workstationId}/machines`, {
+    const res = await apiFetch(`${apiUrl('workstations')}/${workstationId}/machines`, {
         headers: authHeader(token),
     })
 
@@ -37,7 +37,7 @@ export async function createWorkstation(
     token: string,
     payload: WorkstationInsertPayload,
 ): Promise<WorkstationReadOnlyDTO> {
-    const res = await fetch(apiUrl('workstations'), {
+    const res = await apiFetch(apiUrl('workstations'), {
         method: 'POST',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -55,7 +55,7 @@ export async function updateWorkstation(
     id: number,
     payload: WorkstationUpdatePayload,
 ): Promise<WorkstationReadOnlyDTO> {
-    const res = await fetch(`${apiUrl('workstations')}/${id}`, {
+    const res = await apiFetch(`${apiUrl('workstations')}/${id}`, {
         method: 'PUT',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -69,7 +69,7 @@ export async function updateWorkstation(
 }
 
 export async function deleteWorkstation(token: string, id: number): Promise<void> {
-    const res = await fetch(`${apiUrl('workstations')}/${id}`, {
+    const res = await apiFetch(`${apiUrl('workstations')}/${id}`, {
         method: 'DELETE',
         headers: authHeader(token),
     })
@@ -95,7 +95,7 @@ export async function createMachine(
     workstationId: number,
     payload: MachineInsertPayload,
 ): Promise<MachineReadOnlyDTO> {
-    const res = await fetch(`${apiUrl('workstations')}/${workstationId}/machines`, {
+    const res = await apiFetch(`${apiUrl('workstations')}/${workstationId}/machines`, {
         method: 'POST',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -114,7 +114,7 @@ export async function updateMachine(
     machineId: number,
     payload: MachineUpdatePayload,
 ): Promise<MachineReadOnlyDTO> {
-    const res = await fetch(`${apiUrl('workstations')}/${workstationId}/machines/${machineId}`, {
+    const res = await apiFetch(`${apiUrl('workstations')}/${workstationId}/machines/${machineId}`, {
         method: 'PUT',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -132,7 +132,7 @@ export async function deleteMachine(
     workstationId: number,
     machineId: number,
 ): Promise<void> {
-    const res = await fetch(`${apiUrl('workstations')}/${workstationId}/machines/${machineId}`, {
+    const res = await apiFetch(`${apiUrl('workstations')}/${workstationId}/machines/${machineId}`, {
         method: 'DELETE',
         headers: authHeader(token),
     })

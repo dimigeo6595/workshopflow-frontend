@@ -1,13 +1,5 @@
 import type { PaginatedResult, ItemReadOnlyDTO } from '@/types'
-import {apiUrl} from "@/api/client.ts";
-
-
-function authHeader(token: string) {
-    return {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-    }
-}
+import { apiUrl, authHeader, apiFetch } from '@/api/client'
 
 export async function getItems(
     token: string,
@@ -28,7 +20,7 @@ export async function getItems(
     if (params?.sortBy) query.set('sortBy', params.sortBy)
     if (params?.sortDescending) query.set('sortDescending', String(params.sortDescending))
 
-    const res = await fetch(`${apiUrl('items')}?${query}`, {
+    const res = await apiFetch(`${apiUrl('items')}?${query}`, {
         headers: authHeader(token),
     })
 
@@ -37,7 +29,7 @@ export async function getItems(
 }
 
 export async function deleteItem(token: string, id: number): Promise<void> {
-    const res = await fetch(`${apiUrl('items')}/${id}`, {
+    const res = await apiFetch(`${apiUrl('items')}/${id}`, {
         method: 'DELETE',
         headers: authHeader(token),
     })
@@ -68,7 +60,7 @@ export async function createItem(
     token: string,
     payload: ItemInsertPayload,
 ): Promise<ItemReadOnlyDTO> {
-    const res = await fetch(apiUrl('items'), {
+    const res = await apiFetch(apiUrl('items'), {
         method: 'POST',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -87,7 +79,7 @@ export async function updateItem(
     id: number,
     payload: ItemUpdatePayload,
 ): Promise<ItemReadOnlyDTO> {
-    const res = await fetch(`${apiUrl('items')}/${id}`, {
+    const res = await apiFetch(`${apiUrl('items')}/${id}`, {
         method: 'PUT',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -105,7 +97,7 @@ export async function calculateWeight(
     token: string,
     itemId: number,
 ): Promise<ItemReadOnlyDTO> {
-    const res = await fetch(`${apiUrl('items')}/${itemId}/calculate-weight`, {
+    const res = await apiFetch(`${apiUrl('items')}/${itemId}/calculate-weight`, {
         method: 'POST',
         headers: authHeader(token),
     })
@@ -117,5 +109,3 @@ export async function calculateWeight(
 
     return res.json()
 }
-
-

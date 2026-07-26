@@ -1,9 +1,10 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 import { jwtDecode } from 'jwt-decode'
 import { deleteCookie, getCookie, setCookie } from '@/utils/cookies'
 import { login } from '@/api/auth'
 import type { LoginFields } from '@/schemas/auth'
 import type { AuthUser, Capability, JwtPayload, UserRole } from '@/types'
+
 
 // ─── Context shape ────────────────────────────────────────────────────────────
 
@@ -73,6 +74,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null)
   }
 
+  // Token expiry check on mount
+  useEffect(() => {
+    if (!accessToken) return
+
+    try {
+      const payload = jwtDecode<JwtPayload>(accessToken)
+      const exp = payload.exp
+      if (exp && Date.now() / 1000 > exp) {
+        setTimeout(() => logoutUser(), 0)
+      }
+    } catch {
+      setTimeout(() => logoutUser(), 0)
+    }
+  }, [])
+
+  // Global 401 listener
+  useEffect(() => {
+    function handleUnauthorized() {
+      logoutUser()
+    }
+
+    window.addEventListener('auth:unauthorized', handleUnauthorized)
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized)
+  }, [])
+
   const hasCapability = (cap: Capability): boolean => {
     if (!user) return false
     // ADMIN has access to everything
@@ -96,6 +122,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const ctx = useContext(AuthContext)
   if (!ctx) throw new Error('useAuth must be used within an AuthProvider')

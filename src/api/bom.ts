@@ -1,11 +1,11 @@
-import { apiUrl, authHeader } from '@/api/client'
+import { apiUrl, authHeader, apiFetch } from '@/api/client'
 import type { BomLineReadOnlyDTO } from '@/types'
 
 export async function getBom(
     token: string,
     producedItemId: number,
 ): Promise<BomLineReadOnlyDTO[]> {
-    const res = await fetch(`${apiUrl('items')}/${producedItemId}/bom`, {
+    const res = await apiFetch(`${apiUrl('items')}/${producedItemId}/bom`, {
         headers: authHeader(token),
     })
 
@@ -30,7 +30,7 @@ export async function addBomLine(
     producedItemId: number,
     payload: BomLineInsertPayload,
 ): Promise<BomLineReadOnlyDTO> {
-    const res = await fetch(`${apiUrl('items')}/${producedItemId}/bom`, {
+    const res = await apiFetch(`${apiUrl('items')}/${producedItemId}/bom`, {
         method: 'POST',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -49,7 +49,7 @@ export async function updateBomLine(
     bomLineId: number,
     payload: BomLineUpdatePayload,
 ): Promise<BomLineReadOnlyDTO> {
-    const res = await fetch(`${apiUrl('items')}/${producedItemId}/bom/${bomLineId}`, {
+    const res = await apiFetch(`${apiUrl('items')}/${producedItemId}/bom/${bomLineId}`, {
         method: 'PUT',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -67,7 +67,7 @@ export async function deleteBomLine(
     producedItemId: number,
     bomLineId: number,
 ): Promise<void> {
-    const res = await fetch(`${apiUrl('items')}/${producedItemId}/bom/${bomLineId}`, {
+    const res = await apiFetch(`${apiUrl('items')}/${producedItemId}/bom/${bomLineId}`, {
         method: 'DELETE',
         headers: authHeader(token),
     })

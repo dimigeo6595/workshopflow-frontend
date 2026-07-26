@@ -1,11 +1,11 @@
-import { apiUrl, authHeader } from '@/api/client'
+import { apiUrl, authHeader, apiFetch } from '@/api/client'
 import type { RoutingStepReadOnlyDTO } from '@/types'
 
 export async function getRouting(
     token: string,
     producedItemId: number,
 ): Promise<RoutingStepReadOnlyDTO[]> {
-    const res = await fetch(`${apiUrl('items')}/${producedItemId}/routing`, {
+    const res = await apiFetch(`${apiUrl('items')}/${producedItemId}/routing`, {
         headers: authHeader(token),
     })
 
@@ -36,7 +36,7 @@ export async function addRoutingStep(
     producedItemId: number,
     payload: RoutingStepInsertPayload,
 ): Promise<RoutingStepReadOnlyDTO> {
-    const res = await fetch(`${apiUrl('items')}/${producedItemId}/routing`, {
+    const res = await apiFetch(`${apiUrl('items')}/${producedItemId}/routing`, {
         method: 'POST',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -55,7 +55,7 @@ export async function updateRoutingStep(
     stepId: number,
     payload: RoutingStepUpdatePayload,
 ): Promise<RoutingStepReadOnlyDTO> {
-    const res = await fetch(`${apiUrl('items')}/${producedItemId}/routing/${stepId}`, {
+    const res = await apiFetch(`${apiUrl('items')}/${producedItemId}/routing/${stepId}`, {
         method: 'PUT',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -73,7 +73,7 @@ export async function deleteRoutingStep(
     producedItemId: number,
     stepId: number,
 ): Promise<void> {
-    const res = await fetch(`${apiUrl('items')}/${producedItemId}/routing/${stepId}`, {
+    const res = await apiFetch(`${apiUrl('items')}/${producedItemId}/routing/${stepId}`, {
         method: 'DELETE',
         headers: authHeader(token),
     })

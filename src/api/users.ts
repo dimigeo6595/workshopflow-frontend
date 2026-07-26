@@ -1,4 +1,4 @@
-import { apiUrl, authHeader } from '@/api/client'
+import { apiUrl, authHeader, apiFetch } from '@/api/client'
 import type { PaginatedResult, UserReadOnlyDTO } from '@/types'
 
 export async function getUsers(
@@ -12,7 +12,7 @@ export async function getUsers(
     if (params?.pageNumber) query.set('pageNumber', String(params.pageNumber))
     if (params?.pageSize) query.set('pageSize', String(params.pageSize))
 
-    const res = await fetch(`${apiUrl('users')}?${query}`, {
+    const res = await apiFetch(`${apiUrl('users')}?${query}`, {
         headers: authHeader(token),
     })
 
@@ -40,7 +40,7 @@ export async function createUser(
     token: string,
     payload: UserInsertPayload,
 ): Promise<UserReadOnlyDTO> {
-    const res = await fetch(apiUrl('users'), {
+    const res = await apiFetch(apiUrl('users'), {
         method: 'POST',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -58,7 +58,7 @@ export async function updateUser(
     id: number,
     payload: UserUpdatePayload,
 ): Promise<UserReadOnlyDTO> {
-    const res = await fetch(`${apiUrl('users')}/${id}`, {
+    const res = await apiFetch(`${apiUrl('users')}/${id}`, {
         method: 'PUT',
         headers: authHeader(token),
         body: JSON.stringify(payload),
@@ -72,7 +72,7 @@ export async function updateUser(
 }
 
 export async function deleteUser(token: string, id: number): Promise<void> {
-    const res = await fetch(`${apiUrl('users')}/${id}`, {
+    const res = await apiFetch(`${apiUrl('users')}/${id}`, {
         method: 'DELETE',
         headers: authHeader(token),
     })

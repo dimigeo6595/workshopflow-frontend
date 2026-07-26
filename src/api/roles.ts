@@ -1,8 +1,8 @@
-import { apiUrl, authHeader } from '@/api/client'
+import { apiUrl, authHeader, apiFetch } from '@/api/client'
 import type { RoleReadOnlyDTO } from '@/types'
 
 export async function getRoles(token: string): Promise<RoleReadOnlyDTO[]> {
-    const res = await fetch(apiUrl('roles'), {
+    const res = await apiFetch(apiUrl('roles'), {
         headers: authHeader(token),
     })
 
